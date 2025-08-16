@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ฟอร์มบันทึกงานขายประกันรถยนต์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1><i class="fas fa-car-alt"></i> ฟอร์มบันทึกงานขายประกันรถยนต์</h1>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalRecords">0</span>
+                    <span class="stat-label">รายการทั้งหมด</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalAmount">0</span>
+                    <span class="stat-label">ยอดรวม (บาท)</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- แจ้งเตือน -->
+        <div id="alertContainer"></div>
+
+        <!-- ฟอร์มกรอกข้อมูล -->
+        <div class="form-container">
+            <form id="formInsurance" onsubmit="return false;">
+                <!-- ข้อมูลส่วนตัว -->
+                <fieldset class="form-section">
+                    <legend><i class="fas fa-user"></i> ข้อมูลส่วนตัว</legend>
+                    <div class="row">
+                        <div class="col">
+                            <label>ชื่อลูกค้า <span class="required">*</span></label>
+                            <input type="text" id="custName" placeholder="ชื่อ-นามสกุล" required>
+                            <div class="error-message" id="custName-error"></div>
+                        </div>
+                        <div class="col">
+                            <label>ระดับสมาชิก</label>
+                            <select id="memberLevel" onchange="toggleMemberCode()">
+                                <option value="ไม่เป็นสมาชิก">ไม่เป็นสมาชิก</option>
+                                <option value="Lv.6">Lv.6</option>
+                                <option value="Lv.5">Lv.5</option>
+                                <option value="Lv.4">Lv.4</option>
+                                <option value="Lv.3">Lv.3</option>
+                                <option value="Lv.2">Lv.2</option>
+                                <option value="Lv.1">Lv.1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" id="memberCode" placeholder="กรอกรหัสสมาชิก" style="display:none;">
+                            <div class="error-message" id="memberCode-error"></div>
+                        </div>
+                        <div class="col">
+                            <label>เบอร์โทร <span class="required">*</span></label>
+                            <input type="text" id="phone" placeholder="09x-xxx-xxxx" required pattern="[0-9]{10}">
+                            <div class="error-message" id="phone-error"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col full">
+                            <label>ที่อยู่</label>
+                            <textarea id="address" rows="2" placeholder="ที่อยู่ / หมายเหตุ"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>ที่อยู่จัดส่งเอกสาร</label>
+                            <select id="docAddressType" onchange="toggleDocAddress()">
+                                <option value="ตามบัตรประชาชน">จัดส่งตามที่อยู่บัตรประชาชน</option>
+                                <option value="ที่อยู่อื่น">จัดส่งตามที่อยู่อื่น</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <textarea id="docAddress" rows="2" placeholder="ที่อยู่จัดส่งเอกสาร (ถ้าเลือกที่อยู่อื่น)" class="hidden"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- ข้อมูลรถ -->
+                <fieldset class="form-section">
+                    <legend><i class="fas fa-car"></i> ข้อมูลรถ</legend>
+                    <div class="row">
+                        <div class="col">
+                            <label>ทะเบียนรถ <span class="required">*</span></label>
+                            <input type="text" id="plate" placeholder="ทะเบียนรถ เช่น กข-1234" required>
+                            <div class="error-message" id="plate-error"></div>
+                        </div>
+                        <div class="col">
+                            <label>ยี่ห้อ / รุ่น <span class="required">*</span></label>
+                            <input type="text" id="model" placeholder="Toyota Vios / Honda City" required>
+                            <div class="error-message" id="model-error"></div>
+                        </div>
+                        <div class="col">
+                            <label>ปีรถ <span class="required">*</span></label>
+                            <input type="text" id="year" placeholder="ปีรถ" required pattern="[0-9]{4}">
+                            <div class="error-message" id="year-error"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>เลขตัวถัง (VIN)</label>
+                            <input type="text" id="vin" placeholder="เลขตัวถัง">
+                        </div>
+                        <div class="col">
+                            <label>เลขเครื่องยนต์</label>
+                            <input type="text" id="engineNo" placeholder="เลขเครื่องยนต์">
+                        </div>
+                        <div class="col">
+                            <label>ซีซี</label>
+                            <input type="text" id="cc" placeholder="ขนาดเครื่องยนต์">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>จำนวนที่นั่ง</label>
+                            <input type="text" id="seat" placeholder="จำนวนที่นั่ง">
+                        </div>
+                        <div class="col">
+                            <label>สีรถ</label>
+                            <input type="text" id="color" placeholder="สีรถ">
+                        </div>
+                        <div class="col">
+                            <label>อุปกรณ์ตกแต่ง</label>
+                            <input type="text" id="accessory" placeholder="อุปกรณ์ตกแต่ง">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>ลักษณะการใช้งาน</label>
+                            <select id="useType" onchange="toggleOtherUseType()">
+                                <option value="ใช้ส่วนบุคคล">ใช้ส่วนบุคคล</option>
+                                <option value="รับจ้าง">รับจ้าง</option>
+                                <option value="อื่นๆ">อื่นๆ ระบุ</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="otherUseType" placeholder="ระบุการใช้งานอื่นๆ" class="hidden">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- ข้อมูลประกันภัย -->
+                <fieldset class="form-section">
+                    <legend><i class="fas fa-shield-alt"></i> ข้อมูลประกันภัย</legend>
+                    <div class="row">
+                        <div class="col">
+                            <label>ประเภทประกัน <span class="required">*</span></label>
+                            <select id="insuranceType" onchange="togglePolicySub()" required>
+                                <option value="">เลือกประเภทประกัน</option>
+                                <option value="พรบ">พ.ร.บ. (ภาคบังคับ)</option>
+                                <option value="สมัครใจ">ประกันภัยภาคสมัครใจ</option>
+                                <option value="พรบ+สมัครใจ">พรบ.+สมัครใจ</option>
+                            </select>
+                            <div class="error-message" id="insuranceType-error"></div>
+                        </div>
+                        <div class="col" id="policySubContainer" style="display:none;">
+                            <label>ประเภทประกันภาคสมัครใจ</label>
+                            <select id="policySubType">
+                                <option value="">-- เลือกประเภท --</option>
+                                <option value="ประกันชั้น 1">ประกันชั้น 1</option>
+                                <option value="ประกันชั้น 2+">ประกันชั้น 2+</option>
+                                <option value="ประกันชั้น 3+">ประกันชั้น 3+</option>
+                                <option value="ประกันชั้น 3">ประกันชั้น 3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- พรบ -->
+                    <div class="insurance-group">
+                        <h4><i class="fas fa-gavel"></i> ประกัน พ.ร.บ.</h4>
+                        <div class="row">
+                            <div class="col">
+                                <label>บริษัทประกัน พรบ.</label>
+                                <select id="companyPRB">
+                                    <option value="">เลือกบริษัท</option>
+                                    <option>วิริยะประกันภัย</option>
+                                    <option>คุ้มภัยโตเกียวมารีนประกันภัย</option>
+                                    <option>กรุงเทพประกันภัย</option>
+                                    <option>เมืองไทยประกันภัย</option>
+                                    <option>ธนชาตประกันภัย</option>
+                                    <option>ทิพยประกันภัย</option>
+                                    <option>แอลเอ็มจีประกันภัย</option>
+                                    <option>ไทยวิวัฒน์ประกันภัย</option>
+                                    <option>ไอโออิ กรุงเทพ ประกันภัย</option>
+                                    <option>เออร์โกประกันภัย</option>
+                                    <option>อลิอันซ์ อยุธยา ประกันภัย</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label>เบี้ย พรบ. (บาท)</label>
+                                <input type="number" step="0.01" id="premiumPRB" placeholder="0.00" value="0" oninput="calcTotal()">
+                            </div>
+                            <div class="col">
+                                <label>ส่วนลด พรบ. (บาท)</label>
+                                <input type="number" step="0.01" id="discountPRB" placeholder="0.00" value="0" oninput="calcTotal()">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label>วันเริ่มคุ้มครอง พรบ.</label>
+                                <input type="date" id="startPRB">
+                            </div>
+                            <div class="col">
+                                <label>วันหมดอายุ พรบ.</label>
+                                <input type="date" id="endPRB">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ประกันภาคสมัครใจ -->
+                    <div class="insurance-group">
+                        <h4><i class="fas fa-heart"></i> ประกันภาคสมัครใจ</h4>
+                        <div class="row">
+                            <div class="col">
+                                <label>บริษัทประกัน ภาคสมัครใจ</label>
+                                <select id="companyVOL">
+                                    <option value="">เลือกบริษัท</option>
+                                    <option>วิริยะประกันภัย</option>
+                                    <option>คุ้มภัยโตเกียวมารีนประกันภัย</option>
+                                    <option>กรุงเทพประกันภัย</option>
+                                    <option>เมืองไทยประกันภัย</option>
+                                    <option>ธนชาตประกันภัย</option>
+                                    <option>ทิพยประกันภัย</option>
+                                    <option>แอลเอ็มจีประกันภัย</option>
+                                    <option>ไทยวิวัฒน์ประกันภัย</option>
+                                    <option>ไอโออิ กรุงเทพ ประกันภัย</option>
+                                    <option>เออร์โกประกันภัย</option>
+                                    <option>อลิอันซ์ อยุธยา ประกันภัย</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label>เบี้ยประกัน (บาท)</label>
+                                <input type="number" step="0.01" id="premiumVOL" placeholder="0.00" value="0" oninput="calcTotal()">
+                            </div>
+                            <div class="col">
+                                <label>ส่วนลดประกัน (บาท)</label>
+                                <input type="number" step="0.01" id="discountVOL" placeholder="0.00" value="0" oninput="calcTotal()">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label>วันเริ่มคุ้มครอง ประกันภัยภาคสมัครใจ</label>
+                                <input type="date" id="startVOL">
+                            </div>
+                            <div class="col">
+                                <label>วันหมดอายุ ประกันภัยภาคสมัครใจ</label>
+                                <input type="date" id="endVOL">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- การชำระเงิน -->
+                    <div class="payment-section">
+                        <h4><i class="fas fa-credit-card"></i> การชำระเงิน</h4>
+                        <div class="row">
+                            <div class="col">
+                                <label>ชำระเงิน</label>
+                                <select id="paymentType" onchange="togglePaymentPlan()">
+                                    <option value="เต็มจำนวน">เต็มจำนวน</option>
+                                    <option value="ผ่อนชำระ">ผ่อนชำระ</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select id="paymentMonth" class="hidden">
+                                    <option value="3m">3 เดือน</option>
+                                    <option value="6m">6 เดือน</option>
+                                    <option value="10m">10 เดือน</option>
+                                    <option value="other">อื่นๆ ระบุ</option>
+                                </select>
+                                <input type="text" id="paymentOther" placeholder="ระบุจำนวนเดือน" class="hidden">
+                            </div>
+                        </div>
+                        <div class="total-section">
+                            <div class="total-display">
+                                <label>ยอดรวมทั้งสิ้น</label>
+                                <input type="text" id="totalPremium" readonly value="0.00" class="total-input">
+                                <span class="currency">บาท</span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- ปุ่มควบคุม -->
+                <div class="form-actions">
+                    <button type="button" class="btn-primary" onclick="addRecord()">
+                        <i class="fas fa-save"></i> บันทึกข้อมูล
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="clearForm()">
+                        <i class="fas fa-eraser"></i> ล้างฟอร์ม
+                    </button>
+                    <button type="button" class="btn-info" onclick="generateRandomData()">
+                        <i class="fas fa-random"></i> สร้างข้อมูลตัวอย่าง
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ส่วนจัดการข้อมูล -->
+        <div class="data-management">
+            <div class="section-header">
+                <h2><i class="fas fa-table"></i> จัดการข้อมูล</h2>
+                <div class="table-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="ค้นหา..." onkeyup="filterTable()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <select id="recordsPerPage" onchange="changeRecordsPerPage()">
+                        <option value="10">10 รายการ/หน้า</option>
+                        <option value="25">25 รายการ/หน้า</option>
+                        <option value="50">50 รายการ/หน้า</option>
+                        <option value="100">100 รายการ/หน้า</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ปุ่ม Import/Export -->
+            <div class="import-export-controls">
+                <div class="export-group">
+                    <button class="btn-success" onclick="exportExcel()">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                    <button class="btn-success" onclick="exportCSV()">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <button class="btn-info" onclick="printTable()">
+                        <i class="fas fa-print"></i> พิมพ์รายงาน
+                    </button>
+                </div>
+                <div class="import-group">
+                    <input type="file" id="importFile" accept=".xlsx,.csv,.json" style="display:none;">
+                    <button class="btn-warning" onclick="importData()">
+                        <i class="fas fa-file-import"></i> นำเข้าข้อมูล
+                    </button>
+                    <button class="btn-danger" onclick="clearAllData()">
+                        <i class="fas fa-trash-alt"></i> ลบข้อมูลทั้งหมด
+                    </button>
+                </div>
+            </div>
+
+            <!-- ตารางแสดงข้อมูล -->
+            <div class="table-responsive">
+                <table id="tableRecords">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th data-sort="custName">ชื่อลูกค้า <i class="fas fa-sort"></i></th>
+                            <th>ระดับสมาชิก</th>
+                            <th>รหัสสมาชิก</th>
+                            <th>เบอร์โทร</th>
+                            <th>ที่อยู่</th>
+                            <th>ทะเบียนรถ</th>
+                            <th>รุ่นรถ</th>
+                            <th>ปีรถ</th>
+                            <th>ประเภทประกัน</th>
+                            <th data-sort="totalAmount">ยอดรวม <i class="fas fa-sort"></i></th>
+                            <th>วันที่บันทึก</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    แสดง <span id="showingStart">0</span> - <span id="showingEnd">0</span> จาก <span id="totalRows">0</span> รายการ
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับดูรายละเอียด -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>รายละเอียดข้อมูล</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>กำลังประมวลผล...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
